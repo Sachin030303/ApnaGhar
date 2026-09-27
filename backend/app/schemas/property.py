@@ -9,34 +9,15 @@ from app.models.property import (
 
 
 class PropertyBase(BaseModel):
-    title: str = Field(
-        min_length=5,
-        max_length=200,
-    )
-
+    title: str = Field(min_length=5, max_length=200)
     description: str | None = None
 
     property_type: PropertyType
 
-    address: str = Field(
-        min_length=5,
-        max_length=500,
-    )
-
-    city: str = Field(
-        min_length=2,
-        max_length=100,
-    )
-
-    state: str = Field(
-        min_length=2,
-        max_length=100,
-    )
-
-    pincode: str = Field(
-        min_length=4,
-        max_length=10,
-    )
+    address: str = Field(min_length=5, max_length=500)
+    city: str = Field(min_length=2, max_length=100)
+    state: str = Field(min_length=2, max_length=100)
+    pincode: str = Field(min_length=4, max_length=10)
 
     latitude: float | None = Field(
         default=None,
@@ -50,9 +31,7 @@ class PropertyBase(BaseModel):
         le=180,
     )
 
-    monthly_rent: float = Field(
-        gt=0,
-    )
+    monthly_rent: float = Field(gt=0)
 
     security_deposit: float | None = Field(
         default=None,
@@ -157,13 +136,13 @@ class PropertyUpdate(BaseModel):
 class PropertyResponse(PropertyBase):
     id: int
     owner_id: int
+
     is_verified: bool
+
     created_at: datetime
     updated_at: datetime
 
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PropertyListResponse(BaseModel):
