@@ -1,6 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.security import get_current_user
+from app.models.user import User
+
 from app.core.database import get_db
 from app.schemas.property import (
     PropertyCreate,
@@ -25,14 +28,12 @@ router = APIRouter(
 def create_property(
     property_data: PropertyCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    # Temporary owner ID until authentication is implemented.
-    owner_id = 1
-
     return PropertyService.create_property(
         db=db,
         property_data=property_data,
-        owner_id=owner_id,
+        owner_id=current_user.id,
     )
 
 
