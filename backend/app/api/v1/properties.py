@@ -1,10 +1,10 @@
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
+from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
-
-from app.core.database import get_db
 from app.schemas.property import (
     PropertyCreate,
     PropertyListResponse,
@@ -90,6 +90,7 @@ def update_property(
     property_id: int,
     property_data: PropertyUpdate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     property_obj = PropertyService.get_property(
         db=db,
@@ -100,6 +101,12 @@ def update_property(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Property not found",
+        )
+
+    if property_obj.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to update this property",
         )
 
     return PropertyService.update_property(
@@ -116,6 +123,7 @@ def update_property(
 def delete_property(
     property_id: int,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     property_obj = PropertyService.get_property(
         db=db,
@@ -126,6 +134,12 @@ def delete_property(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Property not found",
+        )
+
+    if property_obj.owner_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorized to delete this property",
         )
 
     PropertyService.delete_property(

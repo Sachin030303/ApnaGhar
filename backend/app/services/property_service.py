@@ -89,3 +89,35 @@ class PropertyService:
             db=db,
             property_obj=property_obj,
         )
+
+
+
+
+    @staticmethod
+    def search_properties(
+        db: Session,
+        city: str | None = None,
+        property_type=None,
+        min_rent: float | None = None,
+        max_rent: float | None = None,
+        bedrooms: int | None = None,
+        furnishing_status=None,
+        is_available: bool | None = True,
+        page: int = 1,
+        page_size: int = 20,
+    ) -> tuple[list[Property], int]:
+
+        skip = (page - 1) * page_size
+
+        return PropertyRepository.search_properties(
+            db=db,
+            city=city,
+            property_type=property_type,
+            min_rent=min_rent,
+            max_rent=max_rent,
+            bedrooms=bedrooms,
+            furnishing_status=furnishing_status,
+            is_available=is_available,
+            skip=skip,
+            limit=page_size,
+        )
