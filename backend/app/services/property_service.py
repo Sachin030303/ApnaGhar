@@ -1,8 +1,13 @@
+from typing import Literal
+
 from sqlalchemy.orm import Session
 
 from app.models.property import Property
 from app.repositories.property_repository import PropertyRepository
-from app.schemas.property import PropertyCreate, PropertyUpdate
+from app.schemas.property import (
+    PropertyCreate,
+    PropertyUpdate,
+)
 
 
 class PropertyService:
@@ -58,7 +63,9 @@ class PropertyService:
             limit=page_size,
         )
 
-        total = PropertyRepository.count(db=db)
+        total = PropertyRepository.count(
+            db=db
+        )
 
         return properties, total
 
@@ -90,9 +97,6 @@ class PropertyService:
             property_obj=property_obj,
         )
 
-
-
-
     @staticmethod
     def search_properties(
         db: Session,
@@ -103,11 +107,43 @@ class PropertyService:
         bedrooms: int | None = None,
         furnishing_status=None,
         is_available: bool | None = True,
+        latitude: float | None = None,
+        longitude: float | None = None,
+        radius_km: float | None = None,
         page: int = 1,
         page_size: int = 20,
-    ) -> tuple[list[Property], int]:
+        sort_by: Literal[
+            "monthly_rent",
+            "created_at",
+            "distance",
+        ] = "created_at",
+        sort_order: Literal[
+            "asc",
+            "desc",
+        ] = "desc",
+    ) -> tuple[
+        list[tuple[Property, float | None]],
+        int,
+    ]:
+
+        # -----------------------------------------
+        # PAGINATION VALIDATION
+        # -----------------------------------------
+
+        if page < 1:
+            page = 1
+
+        if page_size < 1:
+            page_size = 20
+
+        if page_size > 100:
+            page_size = 100
 
         skip = (page - 1) * page_size
+
+        # -----------------------------------------
+        # SEARCH
+        # -----------------------------------------
 
         return PropertyRepository.search_properties(
             db=db,
@@ -118,6 +154,11 @@ class PropertyService:
             bedrooms=bedrooms,
             furnishing_status=furnishing_status,
             is_available=is_available,
+            latitude=latitude,
+            longitude=longitude,
+            radius_km=radius_km,
             skip=skip,
             limit=page_size,
+            sort_by=sort_by,
+            sort_order=sort_order,
         )
