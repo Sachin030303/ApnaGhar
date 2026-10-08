@@ -3,7 +3,7 @@ from enum import Enum
 from app.models.property import Property
 from sqlalchemy import Boolean, DateTime, Enum as SQLEnum, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
+from app.models.favorite import Favorite
 from app.core.database import Base
 
 
@@ -73,5 +73,11 @@ class User(Base):
     properties: Mapped[list["Property"]] = relationship(
         "Property",
         back_populates="owner",
+        cascade="all, delete-orphan",
+    )
+
+    favorites: Mapped[list["Favorite"]] = relationship(
+        "Favorite",
+        back_populates="user",
         cascade="all, delete-orphan",
     )

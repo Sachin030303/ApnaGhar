@@ -7,6 +7,7 @@ from sqlalchemy import (
     Enum as SQLEnum,
     Float,
     ForeignKey,
+    Index,
     Integer,
     String,
     Text,
@@ -33,6 +34,33 @@ class FurnishingStatus(str, Enum):
 
 class Property(Base):
     __tablename__ = "properties"
+
+    __table_args__ = (
+        Index(
+            "ix_properties_property_type",
+            "property_type",
+        ),
+        Index(
+            "ix_properties_monthly_rent",
+            "monthly_rent",
+        ),
+        Index(
+            "ix_properties_bedrooms",
+            "bedrooms",
+        ),
+        Index(
+            "ix_properties_furnishing_status",
+            "furnishing_status",
+        ),
+        Index(
+            "ix_properties_is_available",
+            "is_available",
+        ),
+        Index(
+            "ix_properties_created_at",
+            "created_at",
+        ),
+    )
 
     id: Mapped[int] = mapped_column(
         Integer,
@@ -148,4 +176,17 @@ class Property(Base):
     owner = relationship(
         "User",
         back_populates="properties",
+    )
+
+    favorites: Mapped[list["Favorite"]] = relationship(
+        "Favorite",
+        back_populates="property",
+        cascade="all, delete-orphan",
+    )
+
+    images: Mapped[list["PropertyImage"]] = relationship(
+        "PropertyImage",
+        back_populates="property",
+        cascade="all, delete-orphan",
+        order_by="PropertyImage.display_order",
     )
